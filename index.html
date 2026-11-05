@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duck Tool - Dashboard</title>
+    <title>Duck Tool - Secure Dashboard</title>
     <style>
         * {
             box-sizing: border-box;
@@ -28,10 +28,87 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.5; /* Opacità bilanciata */
+            opacity: 0.5;
         }
 
-        /* Barra laterale */
+        /* Schermata di Login */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            border: 2px solid #FFD700;
+            padding: 40px;
+            background-color: #111;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .login-box h2 {
+            border: none;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .login-box input {
+            display: block;
+            width: 300px;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: #000;
+            border: 1px solid #555;
+            color: #FFD700;
+            font-family: 'Consolas', monospace;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .login-box input:focus {
+            border-color: #FFD700;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 15px;
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Consolas', monospace;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+
+        .login-box button:hover {
+            background-color: #B8860B;
+        }
+
+        .error-msg {
+            color: red;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Layout del sito (nascosto all'inizio) */
+        #main-site {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
         .sidebar {
             width: 250px;
             background-color: #111;
@@ -74,12 +151,11 @@
             border-left: 4px solid #FFD700;
         }
 
-        /* Area principale */
         .main-content {
             flex: 1;
             padding: 40px;
             overflow-y: auto;
-            background: rgba(0, 0, 0, 0.75); /* Sfondo semi-trasparente */
+            background: rgba(0, 0, 0, 0.75);
             z-index: 1;
             display: flex;
             flex-direction: column;
@@ -105,7 +181,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Stile Logo */
         .logo {
             color: #FFD700;
             font-size: 14px;
@@ -131,7 +206,6 @@
             color: #ccc;
         }
 
-        /* Link Discord */
         .discord-link {
             display: block;
             background-color: #222;
@@ -149,7 +223,6 @@
             color: #FFD700;
         }
 
-        /* Bottone Download */
         .download-btn {
             background-color: #FFD700;
             color: black;
@@ -174,7 +247,6 @@
             box-shadow: 0 0 15px #FFD700;
         }
 
-        /* Stile Changelog */
         .changelog-item {
             border-left: 2px solid #555;
             padding-left: 20px;
@@ -197,95 +269,130 @@
         }
         ul { margin-left: 20px; color: #ccc;}
         li { margin-bottom: 5px; }
+
+        /* Finto schermo per l'anti-ispeziona */
+        #devtools-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: red;
+            font-size: 30px;
+            font-weight: bold;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-align: center;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="server-name">Duck Tool</div>
-        <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
-        <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
-        <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
-        <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>RESTRICTED ACCESS</h2>
+            <input type="email" id="username" placeholder="Email (admin@quacktool)" autocomplete="off">
+            <input type="password" id="password" placeholder="Password" autocomplete="off">
+            <button onclick="login()">ACCESS SYSTEM</button>
+            <div class="error-msg" id="error-msg">INVALID CREDENTIALS</div>
+        </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        
-        <!-- PAGINA HOME -->
-        <div id="home" class="page active">
-            <div class="logo">
+    <!-- MAIN SITE -->
+    <div id="main-site">
+        <div class="sidebar">
+            <div class="server-name">Duck Tool</div>
+            <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
+            <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
+            <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
+            <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
+        </div>
+
+        <div class="main-content">
+            <div id="home" class="page active">
+                <div class="logo">
 ██████╗ ██╗   ██╗ ██████╗██╗  ██╗    ████████╗ ██████╗  ██████╗ ██╗     
 ██╔══██╗██║   ██║██╔════╝██║ ██╔╝    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     
 ██║  ██║██║   ██║██║     █████╔╝        ██║   ██║   ██║██║   ██║██║     
 ██║  ██║██║   ██║██║     ██╔═██╗        ██║   ██║   ██║██║   ██║██║     
 ██████╔╝╚██████╔╝╚██████╗██║  ██╗       ██║   ╚██████╔╝╚██████╔╝███████╗
 ╚═════╝  ╚═════╝  ╚═════╝╚═╝  ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝
+                </div>
+                <h2>Welcome</h2>
+                <p>Download the latest version of the toolkit. Click the button below to start the download.</p>
+                <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
             </div>
-            <h2>Welcome</h2>
-            <p>Download the latest version of the toolkit. Click the button below to start the download.</p>
-            
-            <!-- PULSANTE DOWNLOAD CORRETTO PER IL FILE .EXE -->
-            <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
-            
-        </div>
 
-        <!-- PAGINA SOCIALS -->
-        <div id="socials" class="page">
-            <h2>Links & Socials</h2>
-            <p>Join our Discord communities for updates, support, and more.</p>
-            
-            <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
-                <strong>Community Server</strong><br>
-                <span style="font-size: 12px; color: #888;">https://discord.gg/wFpSKUMkp</span>
-            </a>
-            
-            <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
-                <strong>Sponsor Server</strong><br>
-                <span style="font-size: 12px; color: #888;">https://discord.gg/KEmkMDmae</span>
-            </a>
-        </div>
-
-        <!-- PAGINA CHANGELOG -->
-        <div id="changelog" class="page">
-            <h2>Changelog</h2>
-            
-            <div class="changelog-item">
-                <div class="changelog-date">Version 0.0.0 (Current)</div>
-                <ul>
-                    <li>Initial release of Duck Tool.</li>
-                    <li>Added Ransomware simulation mode.</li>
-                    <li>Added fake Token Stealer.</li>
-                    <li>Added interactive Minigame to bypass lockdown.</li>
-                </ul>
+            <div id="socials" class="page">
+                <h2>Links & Socials</h2>
+                <p>Join our Discord communities for updates, support, and more.</p>
+                <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
+                    <strong>Community Server</strong><br>
+                    <span style="font-size: 12px; color: #888;">https://discord.gg/wFpSKUMkp</span>
+                </a>
+                <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
+                    <strong>Sponsor Server</strong><br>
+                    <span style="font-size: 12px; color: #888;">https://discord.gg/KEmkMDmae</span>
+                </a>
             </div>
-            
-            <div class="changelog-item">
-                <div class="changelog-date">Version Beta</div>
-                <ul>
-                    <li>Internal testing only.</li>
-                    <li>Added 20 hacking modules to the UI.</li>
-                </ul>
+
+            <div id="changelog" class="page">
+                <h2>Changelog</h2>
+                <div class="changelog-item">
+                    <div class="changelog-date">Version 0.0.0 (Current)</div>
+                    <ul>
+                        <li>Initial release of Duck Tool.</li>
+                        <li>Added Ransomware simulation mode.</li>
+                        <li>Added fake Token Stealer.</li>
+                        <li>Added interactive Minigame to bypass lockdown.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="credits" class="page">
+                <h2>Credits</h2>
+                <p><strong>Developer:</strong> MrDuckyzx</p>
+                <p><strong>Design & Logic:</strong> MrDuckyzx</p>
+                <p><strong>Special Thanks:</strong> To everyone who tested the tool.</p>
             </div>
         </div>
+    </div>
 
-        <!-- PAGINA CREDITS -->
-        <div id="credits" class="page">
-            <h2>Credits</h2>
-            <p><strong>Developer:</strong> MrDuckyzx</p>
-            <p><strong>Design & Logic:</strong> MrDuckyzx</p>
-            <p><strong>Special Thanks:</strong> To everyone who tested the tool.</p>
-            <br>
-            <p style="color: #555; font-size: 12px;">This tool is for educational purposes only. We are not responsible for any misuse.</p>
-        </div>
-
+    <!-- AVVISO DEVTOOLS -->
+    <div id="devtools-warning">
+        <p>SECURITY BREACH DETECTED</p>
+        <p style="font-size: 20px;">CLOSE THE DEVELOPER TOOLS IMMEDIATELY.</p>
     </div>
 
     <script>
-        // Funzione per cambiare pagina
+        // --- LOGIN SYSTEM ---
+        function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const error = document.getElementById('error-msg');
+
+            if (user === "admin@quacktool" && pass === "duck3993") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-site').style.display = 'flex';
+            } else {
+                error.style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        }
+
+        // Permetti l'invio con il tasto Invio
+        document.getElementById('password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { login(); }
+        });
+
+        // --- NAVIGAZIONE ---
         function changePage(pageId, btn) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
@@ -297,7 +404,31 @@
             btn.classList.add('active');
         }
 
-        // Animazione di sfondo
+        // --- ANTI-ISPEZIONA ---
+        
+        // 1. Blocca il tasto destro del mouse
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 2. Blocca i tasti di scelta rapida (F12, Ctrl+Shift+I, Ctrl+U, ecc.)
+        document.onkeydown = function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || 
+                (e.ctrlKey && e.key === 'U')) {
+                return false;
+            }
+        };
+
+        // 3. Finto schermo se apre la console
+        setInterval(function() {
+            // Se la differenza di dimensione dello schermo è troppa, significa che la console è aperta
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+                document.getElementById('devtools-warning').style.display = 'flex';
+            } else {
+                document.getElementById('devtools-warning').style.display = 'none';
+            }
+        }, 500);
+
+        // --- SFONDO MATRIX ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -327,7 +458,7 @@
             ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = "#FFD700"; // Giallo
+            ctx.fillStyle = "#FFD700";
             ctx.font = fontSize + "px monospace";
 
             for (let i = 0; i < drops.length; i++) {
@@ -340,7 +471,6 @@
                 drops[i]++;
             }
         }
-
         setInterval(draw, 60);
     </script>
 </body>
