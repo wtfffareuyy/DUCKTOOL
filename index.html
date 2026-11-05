@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duck Tool - Secure Dashboard</title>
+    <title>Duck Tool - Portal</title>
     <style>
         * {
             box-sizing: border-box;
@@ -28,11 +28,11 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
-        /* Schermata di Login */
-        #login-screen {
+        /* Schermata Login */
+        #auth-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -58,6 +58,7 @@
             border: none;
             margin-bottom: 30px;
             font-size: 24px;
+            color: #FFD700;
         }
 
         .login-box input {
@@ -102,8 +103,8 @@
             display: none;
         }
 
-        /* Layout del sito (nascosto all'inizio) */
-        #main-site {
+        /* Area Sito / Admin */
+        #app-area {
             display: none;
             width: 100%;
             height: 100%;
@@ -247,45 +248,35 @@
             box-shadow: 0 0 15px #FFD700;
         }
 
-        .changelog-item {
-            border-left: 2px solid #555;
-            padding-left: 20px;
-            margin-bottom: 20px;
-            position: relative;
+        /* Admin Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
         }
-        .changelog-item::before {
-            content: '';
-            position: absolute;
-            left: -6px;
-            top: 5px;
-            width: 10px;
-            height: 10px;
-            background-color: #FFD700;
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
         }
-        .changelog-date {
+        th {
+            background-color: #222;
             color: #FFD700;
-            font-size: 12px;
-            margin-bottom: 5px;
         }
-        ul { margin-left: 20px; color: #ccc;}
-        li { margin-bottom: 5px; }
+        td {
+            color: #aaa;
+        }
+        .status-success { color: #00FF00; }
+        .status-fail { color: #FF0000; }
 
-        /* Finto schermo per l'anti-ispeziona */
+        /* Warning DevTools */
         #devtools-warning {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: black;
-            color: red;
-            font-size: 30px;
-            font-weight: bold;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            text-align: center;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: black; color: red; font-size: 30px;
+            font-weight: bold; display: none; justify-content: center;
+            align-items: center; z-index: 9999; text-align: center;
             flex-direction: column;
         }
     </style>
@@ -294,28 +285,31 @@
 
     <canvas id="bg-canvas"></canvas>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen">
+    <!-- SCHERMATA LOGIN -->
+    <div id="auth-screen">
         <div class="login-box">
-            <h2>RESTRICTED ACCESS</h2>
-            <input type="email" id="username" placeholder="Email (admin@quacktool)" autocomplete="off">
+            <h2>SECURE GATEWAY</h2>
+            <input type="email" id="username" placeholder="Email" autocomplete="off">
             <input type="password" id="password" placeholder="Password" autocomplete="off">
-            <button onclick="login()">ACCESS SYSTEM</button>
+            <button onclick="handleLogin()">ACCESS SYSTEM</button>
             <div class="error-msg" id="error-msg">INVALID CREDENTIALS</div>
         </div>
     </div>
 
-    <!-- MAIN SITE -->
-    <div id="main-site">
+    <!-- AREA SITO -->
+    <div id="app-area">
         <div class="sidebar">
             <div class="server-name">Duck Tool</div>
             <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
             <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
             <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
             <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
+            <!-- Admin Button (Nascosto all'utente normale) -->
+            <button class="nav-btn" id="admin-nav-btn" style="display:none; color: #FF0000;" onclick="changePage('admin-panel', this)"># ADMIN ACCESS</button>
         </div>
 
         <div class="main-content">
+            <!-- HOME (Utente) -->
             <div id="home" class="page active">
                 <div class="logo">
 ██████╗ ██╗   ██╗ ██████╗██╗  ██╗    ████████╗ ██████╗  ██████╗ ██╗     
@@ -330,6 +324,7 @@
                 <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
             </div>
 
+            <!-- SOCIALS (Utente) -->
             <div id="socials" class="page">
                 <h2>Links & Socials</h2>
                 <p>Join our Discord communities for updates, support, and more.</p>
@@ -343,24 +338,37 @@
                 </a>
             </div>
 
+            <!-- CHANGELOG (Utente) -->
             <div id="changelog" class="page">
                 <h2>Changelog</h2>
-                <div class="changelog-item">
-                    <div class="changelog-date">Version 0.0.0 (Current)</div>
-                    <ul>
-                        <li>Initial release of Duck Tool.</li>
-                        <li>Added Ransomware simulation mode.</li>
-                        <li>Added fake Token Stealer.</li>
-                        <li>Added interactive Minigame to bypass lockdown.</li>
-                    </ul>
-                </div>
+                <p>Version 0.0.0 - Initial release.</p>
             </div>
 
+            <!-- CREDITS (Utente) -->
             <div id="credits" class="page">
                 <h2>Credits</h2>
                 <p><strong>Developer:</strong> MrDuckyzx</p>
-                <p><strong>Design & Logic:</strong> MrDuckyzx</p>
-                <p><strong>Special Thanks:</strong> To everyone who tested the tool.</p>
+            </div>
+
+            <!-- ADMIN PANEL (Solo Admin) -->
+            <div id="admin-panel" class="page">
+                <h2>ADMIN DASHBOARD</h2>
+                <p>Live connection logs for Duck Tool.</p>
+                <button onclick="loadLogs()" style="padding: 10px; background: #FFD700; color: black; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px;">Refresh Logs</button>
+                <button onclick="clearLogs()" style="padding: 10px; background: #FF0000; color: white; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px; margin-left: 10px;">Clear Logs</button>
+                <table id="log-table">
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Date/Time</th>
+                            <th>Browser</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- I log appariranno qui -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -368,28 +376,92 @@
     <!-- AVVISO DEVTOOLS -->
     <div id="devtools-warning">
         <p>SECURITY BREACH DETECTED</p>
-        <p style="font-size: 20px;">CLOSE THE DEVELOPER TOOLS IMMEDIATELY.</p>
     </div>
 
     <script>
-        // --- LOGIN SYSTEM ---
-        function login() {
+        // --- LOGICA DI LOGIN E ADMIN ---
+        let isAdmin = false;
+
+        function getIP() {
+            // Usa un'API gratuita per ottenere l'IP pubblico di chi visita il sito
+            return fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => data.ip)
+                .catch(() => "Unknown IP");
+        }
+
+        function saveLog(username, status) {
+            getIP().then(ip => {
+                const logs = JSON.parse(localStorage.getItem('quack_logs') || '[]');
+                const now = new Date().toLocaleString();
+                const browser = navigator.userAgent.substring(0, 50) + "...";
+                
+                logs.push({
+                    ip: ip,
+                    time: now,
+                    browser: browser,
+                    status: status,
+                    user: username
+                });
+                
+                localStorage.setItem('quack_logs', JSON.stringify(logs));
+            });
+        }
+
+        function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             const error = document.getElementById('error-msg');
 
             if (user === "admin@quacktool" && pass === "duck3993") {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-site').style.display = 'flex';
-            } else {
+                isAdmin = true;
+                saveLog(user, "Admin Login");
+                document.getElementById('admin-nav-btn').style.display = 'block';
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-area').style.display = 'flex';
+            } 
+            else if (user !== "" && pass !== "") {
+                // Finto login per l'utente normale
+                saveLog(user, "User Login");
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-area').style.display = 'flex';
+            } 
+            else {
                 error.style.display = 'block';
-                document.getElementById('password').value = '';
+            }
+        }
+
+        // --- FUNZIONI ADMIN ---
+        function loadLogs() {
+            const tbody = document.querySelector('#log-table tbody');
+            tbody.innerHTML = '';
+            const logs = JSON.parse(localStorage.getItem('quack_logs') || '[]');
+
+            // Invertiamo l'array per mostrare prima i più recenti
+            logs.reverse().forEach(log => {
+                const tr = document.createElement('tr');
+                const statusClass = log.status.includes('Admin') ? 'status-success' : 'status-fail';
+                
+                tr.innerHTML = `
+                    <td>${log.ip}</td>
+                    <td>${log.time}</td>
+                    <td>${log.browser}</td>
+                    <td class="${statusClass}">${log.status} (${log.user})</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearLogs() {
+            if(confirm("Are you sure you want to clear all logs?")) {
+                localStorage.setItem('quack_logs', '[]');
+                loadLogs();
             }
         }
 
         // Permetti l'invio con il tasto Invio
         document.getElementById('password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') { login(); }
+            if (e.key === 'Enter') { handleLogin(); }
         });
 
         // --- NAVIGAZIONE ---
@@ -402,25 +474,20 @@
             });
             document.getElementById(pageId).classList.add('active');
             btn.classList.add('active');
+            
+            if (pageId === 'admin-panel') {
+                loadLogs();
+            }
         }
 
         // --- ANTI-ISPEZIONA ---
-        
-        // 1. Blocca il tasto destro del mouse
         document.addEventListener('contextmenu', event => event.preventDefault());
-
-        // 2. Blocca i tasti di scelta rapida (F12, Ctrl+Shift+I, Ctrl+U, ecc.)
         document.onkeydown = function(e) {
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || 
-                (e.ctrlKey && e.key === 'U')) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
                 return false;
             }
         };
-
-        // 3. Finto schermo se apre la console
         setInterval(function() {
-            // Se la differenza di dimensione dello schermo è troppa, significa che la console è aperta
             if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
                 document.getElementById('devtools-warning').style.display = 'flex';
             } else {
