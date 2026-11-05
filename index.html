@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duck Tool - Portal</title>
+    <title>Duck Tool - Secure Gateway</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,7 +20,6 @@
             overflow: hidden;
         }
 
-        /* Sfondo Matrix */
         #bg-canvas {
             position: absolute;
             top: 0;
@@ -207,23 +206,6 @@
             color: #ccc;
         }
 
-        .discord-link {
-            display: block;
-            background-color: #222;
-            color: #fff;
-            text-decoration: none;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #FFD700;
-            transition: all 0.2s;
-        }
-
-        .discord-link:hover {
-            background-color: #333;
-            padding-left: 20px;
-            color: #FFD700;
-        }
-
         .download-btn {
             background-color: #FFD700;
             color: black;
@@ -248,7 +230,6 @@
             box-shadow: 0 0 15px #FFD700;
         }
 
-        /* Admin Table */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -270,7 +251,6 @@
         .status-success { color: #00FF00; }
         .status-fail { color: #FF0000; }
 
-        /* Warning DevTools */
         #devtools-warning {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -301,15 +281,13 @@
         <div class="sidebar">
             <div class="server-name">Duck Tool</div>
             <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
-            <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
             <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
             <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
-            <!-- Admin Button (Nascosto all'utente normale) -->
+            
             <button class="nav-btn" id="admin-nav-btn" style="display:none; color: #FF0000;" onclick="changePage('admin-panel', this)"># ADMIN ACCESS</button>
         </div>
 
         <div class="main-content">
-            <!-- HOME (Utente) -->
             <div id="home" class="page active">
                 <div class="logo">
 ██████╗ ██╗   ██╗ ██████╗██╗  ██╗    ████████╗ ██████╗  ██████╗ ██╗     
@@ -324,36 +302,19 @@
                 <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
             </div>
 
-            <!-- SOCIALS (Utente) -->
-            <div id="socials" class="page">
-                <h2>Links & Socials</h2>
-                <p>Join our Discord communities for updates, support, and more.</p>
-                <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
-                    <strong>Community Server</strong><br>
-                    <span style="font-size: 12px; color: #888;">https://discord.gg/wFpSKUMkp</span>
-                </a>
-                <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
-                    <strong>Sponsor Server</strong><br>
-                    <span style="font-size: 12px; color: #888;">https://discord.gg/KEmkMDmae</span>
-                </a>
-            </div>
-
-            <!-- CHANGELOG (Utente) -->
             <div id="changelog" class="page">
                 <h2>Changelog</h2>
                 <p>Version 0.0.0 - Initial release.</p>
             </div>
 
-            <!-- CREDITS (Utente) -->
             <div id="credits" class="page">
                 <h2>Credits</h2>
                 <p><strong>Developer:</strong> MrDuckyzx</p>
             </div>
 
-            <!-- ADMIN PANEL (Solo Admin) -->
             <div id="admin-panel" class="page">
                 <h2>ADMIN DASHBOARD</h2>
-                <p>Live connection logs for Duck Tool.</p>
+                <p>Live connection logs.</p>
                 <button onclick="loadLogs()" style="padding: 10px; background: #FFD700; color: black; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px;">Refresh Logs</button>
                 <button onclick="clearLogs()" style="padding: 10px; background: #FF0000; color: white; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px; margin-left: 10px;">Clear Logs</button>
                 <table id="log-table">
@@ -366,24 +327,49 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- I log appariranno qui -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- AVVISO DEVTOOLS -->
     <div id="devtools-warning">
         <p>SECURITY BREACH DETECTED</p>
+        <p style="font-size: 16px;">UNAUTHORIZED ACCESS IS PROHIBITED.</p>
     </div>
 
     <script>
-        // --- LOGICA DI LOGIN E ADMIN ---
-        let isAdmin = false;
+        // --- SICUREZZA E ANTI-ISPEZIONA ---
+        
+        // Blocca Tasto Destro
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Blocca Scorciatoie da tastiera (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I/J/C)
+        document.onkeydown = function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.key === 'u') || 
+                (e.ctrlKey && e.key === 's') || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j'))) {
+                return false;
+            }
+        };
+
+        // Finto blocco se apre i DevTools (controlla differenza dimensioni finestra)
+        setInterval(function() {
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+                document.getElementById('devtools-warning').style.display = 'flex';
+            } else {
+                document.getElementById('devtools-warning').style.display = 'none';
+            }
+        }, 500);
+
+        // --- LOGICA LOGIN ---
+        
+        // Le credenziali sono "offuscate" per non farle leggere a colpo d'occhio
+        const SECURE_USER = "YWRtaW5AcXVhY2t0b29s"; // base64 di admin@quacktool
+        const SECURE_PASS = "ZHVjazM5OTM="; // base64 di duck3993
 
         function getIP() {
-            // Usa un'API gratuita per ottenere l'IP pubblico di chi visita il sito
             return fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => data.ip)
@@ -413,15 +399,18 @@
             const pass = document.getElementById('password').value;
             const error = document.getElementById('error-msg');
 
-            if (user === "admin@quacktool" && pass === "duck3993") {
-                isAdmin = true;
+            // Decodifica le credenziali e le confronta
+            const decodedUser = atob(SECURE_USER);
+            const decodedPass = atob(SECURE_PASS);
+
+            if (user === decodedUser && pass === decodedPass) {
                 saveLog(user, "Admin Login");
                 document.getElementById('admin-nav-btn').style.display = 'block';
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-area').style.display = 'flex';
             } 
             else if (user !== "" && pass !== "") {
-                // Finto login per l'utente normale
+                // Finto login per chiunque altro
                 saveLog(user, "User Login");
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-area').style.display = 'flex';
@@ -437,7 +426,6 @@
             tbody.innerHTML = '';
             const logs = JSON.parse(localStorage.getItem('quack_logs') || '[]');
 
-            // Invertiamo l'array per mostrare prima i più recenti
             logs.reverse().forEach(log => {
                 const tr = document.createElement('tr');
                 const statusClass = log.status.includes('Admin') ? 'status-success' : 'status-fail';
@@ -459,7 +447,7 @@
             }
         }
 
-        // Permetti l'invio con il tasto Invio
+        // Tasto Invio per il login
         document.getElementById('password').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') { handleLogin(); }
         });
@@ -479,21 +467,6 @@
                 loadLogs();
             }
         }
-
-        // --- ANTI-ISPEZIONA ---
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
-                return false;
-            }
-        };
-        setInterval(function() {
-            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
-                document.getElementById('devtools-warning').style.display = 'flex';
-            } else {
-                document.getElementById('devtools-warning').style.display = 'none';
-            }
-        }, 500);
 
         // --- SFONDO MATRIX ---
         const canvas = document.getElementById('bg-canvas');
