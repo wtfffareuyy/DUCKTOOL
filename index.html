@@ -5,300 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duck Tool - Secure Portal</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #000; color: #fff; font-family: 'Consolas', 'Courier New', monospace; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* SFONDO MATRIX */
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.4; }
+        
+        /* SCHERMATA LOGIN */
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .login-box { border: 2px solid #FFD700; padding: 40px; background-color: #111; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); width: 400px; }
+        .login-box h2 { border: none; margin-bottom: 30px; font-size: 24px; color: #FFD700; text-transform: uppercase; letter-spacing: 2px; }
+        .login-box input { display: block; width: 100%; padding: 12px; margin-bottom: 15px; background-color: #000; border: 1px solid #555; color: #FFD700; font-family: 'Consolas', monospace; font-size: 16px; outline: none; transition: border 0.3s; }
+        .login-box input:focus { border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+        .login-box button { width: 100%; padding: 15px; background-color: #FFD700; color: #000; border: none; font-weight: bold; font-size: 16px; cursor: pointer; font-family: 'Consolas', monospace; text-transform: uppercase; transition: 0.2s; }
+        .login-box button:hover { background-color: #B8860B; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+        .error-msg { color: red; font-size: 14px; margin-top: 15px; display: none; font-weight: bold; }
 
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Consolas', 'Courier New', monospace;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        /* AREA SITO */
+        #app-area { display: none; width: 100%; height: 100%; }
+        .sidebar { width: 250px; background-color: #111; border-right: 2px solid #333; display: flex; flex-direction: column; z-index: 2; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
+        .server-name { padding: 20px; background-color: #000; border-bottom: 2px solid #333; color: #FFD700; font-weight: bold; font-size: 18px; text-align: center; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-btn { background: none; border: none; color: #aaa; padding: 15px 20px; text-align: left; font-size: 16px; font-family: 'Consolas', monospace; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #222; }
+        .nav-btn:hover, .nav-btn.active { background-color: #222; color: #FFD700; padding-left: 25px; border-left: 4px solid #FFD700; }
+        
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; background: rgba(0, 0, 0, 0.75); z-index: 1; display: flex; flex-direction: column; align-items: center; }
+        .page { display: none; width: 100%; max-width: 800px; background: rgba(10, 10, 10, 0.9); padding: 30px; border: 1px solid #333; animation: fadeIn 0.3s ease; height: 100%; flex-direction: column; }
+        .page.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .logo { color: #FFD700; font-size: 14px; font-weight: bold; white-space: pre; text-align: center; margin-bottom: 30px; text-shadow: 0 0 10px #FFD700; line-height: 1.1; overflow-x: auto; }
+        h2 { color: #FFD700; border-bottom: 2px solid #FFD700; padding-bottom: 10px; margin-bottom: 20px; }
+        p { line-height: 1.6; margin-bottom: 15px; color: #ccc; }
+        
+        .discord-link { display: block; background-color: #222; color: #fff; text-decoration: none; padding: 15px; margin-bottom: 10px; border-left: 4px solid #FFD700; transition: all 0.2s; }
+        .discord-link:hover { background-color: #333; padding-left: 20px; color: #FFD700; }
+        
+        .download-btn { background-color: #FFD700; color: black; border: 2px solid #FFD700; padding: 15px 40px; font-size: 18px; font-weight: bold; cursor: pointer; font-family: 'Consolas', monospace; transition: all 0.2s ease; display: inline-block; margin-top: 20px; text-transform: uppercase; text-decoration: none; text-align: center; user-select: none; }
+        .download-btn:hover { background-color: #000; color: #FFD700; box-shadow: 0 0 15px #FFD700; }
 
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.4;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        th { background-color: #222; color: #FFD700; }
+        td { color: #aaa; }
+        
+        #devtools-warning { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: red; font-size: 30px; font-weight: bold; display: none; justify-content: center; align-items: center; z-index: 9999; text-align: center; flex-direction: column; }
 
-        #auth-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-box {
-            border: 2px solid #FFD700;
-            padding: 40px;
-            background-color: #111;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            width: 400px;
-        }
-
-        .login-box h2 {
-            border: none;
-            margin-bottom: 30px;
-            font-size: 24px;
-            color: #FFD700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .login-box input {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background-color: #000;
-            border: 1px solid #555;
-            color: #FFD700;
-            font-family: 'Consolas', monospace;
-            font-size: 16px;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        .login-box input:focus {
-            border-color: #FFD700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 15px;
-            background-color: #FFD700;
-            color: #000;
-            border: none;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            font-family: 'Consolas', monospace;
-            text-transform: uppercase;
-            transition: 0.2s;
-        }
-
-        .login-box button:hover {
-            background-color: #B8860B;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-
-        .error-msg {
-            color: red;
-            font-size: 14px;
-            margin-top: 15px;
-            display: none;
-            font-weight: bold;
-        }
-
-        #app-area {
-            display: none;
-            width: 100%;
-            height: 100%;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #111;
-            border-right: 2px solid #333;
-            display: flex;
-            flex-direction: column;
-            z-index: 2;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.8);
-        }
-
-        .server-name {
-            padding: 20px;
-            background-color: #000;
-            border-bottom: 2px solid #333;
-            color: #FFD700;
-            font-weight: bold;
-            font-size: 18px;
-            text-align: center;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #aaa;
-            padding: 15px 20px;
-            text-align: left;
-            font-size: 16px;
-            font-family: 'Consolas', monospace;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 1px solid #222;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background-color: #222;
-            color: #FFD700;
-            padding-left: 25px;
-            border-left: 4px solid #FFD700;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .page {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            background: rgba(10, 10, 10, 0.9);
-            padding: 30px;
-            border: 1px solid #333;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            color: #FFD700;
-            font-size: 14px;
-            font-weight: bold;
-            white-space: pre;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px #FFD700;
-            line-height: 1.1;
-            overflow-x: auto;
-        }
-
-        h2 {
-            color: #FFD700;
-            border-bottom: 2px solid #FFD700;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-            color: #ccc;
-        }
-
-        .discord-link {
-            display: block;
-            background-color: #222;
-            color: #fff;
-            text-decoration: none;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #FFD700;
-            transition: all 0.2s;
-        }
-
-        .discord-link:hover {
-            background-color: #333;
-            padding-left: 20px;
-            color: #FFD700;
-        }
-
-        .download-btn {
-            background-color: #FFD700;
-            color: black;
-            border: 2px solid #FFD700;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: 'Consolas', monospace;
-            transition: all 0.2s ease;
-            display: inline-block;
-            margin-top: 20px;
-            text-transform: uppercase;
-            text-decoration: none;
-            text-align: center;
-            user-select: none;
-        }
-
-        .download-btn:hover {
-            background-color: #000;
-            color: #FFD700;
-            box-shadow: 0 0 15px #FFD700;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        th, td {
-            border: 1px solid #333;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #222;
-            color: #FFD700;
-        }
-        td {
-            color: #aaa;
-        }
-
-        #devtools-warning {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: black; color: red; font-size: 30px;
-            font-weight: bold; display: none; justify-content: center;
-            align-items: center; z-index: 9999; text-align: center;
-            flex-direction: column;
-        }
+        /* --- STILI CHAT GLOBALE --- */
+        #chat-container { display: flex; flex-direction: column; height: 100%; }
+        #chat-messages { flex: 1; overflow-y: auto; border: 1px solid #333; background: #050505; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { font-size: 14px; word-wrap: break-word; }
+        .chat-user { font-weight: bold; color: #FFD700; }
+        .chat-user.admin { color: #FF0000; text-shadow: 0 0 5px red; }
+        .chat-text { color: #eee; }
+        .chat-time { font-size: 10px; color: #666; margin-left: 10px; }
+        
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 12px; background: #000; border: 1px solid #555; color: #fff; font-family: 'Consolas', monospace; outline: none; }
+        .chat-input-area input:focus { border-color: #FFD700; }
+        .chat-input-area button { padding: 12px 20px; background: #FFD700; color: #000; border: none; font-weight: bold; cursor: pointer; font-family: 'Consolas', monospace; }
+        .chat-input-area button:hover { background: #B8860B; }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
+    <!-- SCHERMATA LOGIN -->
     <div id="auth-screen">
         <div class="login-box">
             <h2>SECURE GATEWAY</h2>
             <input type="email" id="username" placeholder="Email" autocomplete="off">
             <input type="password" id="password" placeholder="Password" autocomplete="off">
+            <!-- NUOVO: Scelta del Nickname -->
+            <input type="text" id="nickname" placeholder="Nickname (lascia vuoto per Sconosciuto)" autocomplete="off" style="border-color: #00FF00; color: #00FF00;">
             <button onclick="handleLogin()">ACCESS SYSTEM</button>
             <div class="error-msg" id="error-msg">INVALID CREDENTIALS</div>
         </div>
     </div>
 
+    <!-- AREA SITO -->
     <div id="app-area">
         <div class="sidebar">
             <div class="server-name">Duck Tool</div>
             <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
+            <button class="nav-btn" onclick="changePage('chat', this)"># global chat</button>
             <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
             <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
             <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
@@ -318,19 +108,29 @@
                 </div>
                 <h2>Welcome</h2>
                 <p>Download the latest version of the toolkit. Click the button below to start the download.</p>
-                
                 <a href="DuckTool.exe" download class="download-btn" onclick="trackDownload()">DOWNLOAD DUCK TOOL</a>
+            </div>
+
+            <!-- NUOVA PAGINA: CHAT GLOBALE -->
+            <div id="chat" class="page">
+                <h2>Global Chat</h2>
+                <div id="chat-container">
+                    <div id="chat-messages">
+                        <!-- I messaggi appariranno qui -->
+                        <div class="chat-msg"><span class="chat-user admin">ADMIN:</span> <span class="chat-text">Welcome to the global chat.</span></div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatEnter(event)">
+                        <button onclick="sendMessage()">SEND</button>
+                    </div>
+                </div>
             </div>
 
             <div id="socials" class="page">
                 <h2>Links & Socials</h2>
                 <p>Join our Discord communities for updates, support, and more.</p>
-                <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
-                    <strong>Community Server</strong>
-                </a>
-                <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
-                    <strong>Sponsor Server</strong>
-                </a>
+                <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link"><strong>Community Server</strong></a>
+                <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link"><strong>Sponsor Server</strong></a>
             </div>
 
             <div id="changelog" class="page">
@@ -367,6 +167,7 @@
         <p>SECURITY BREACH DETECTED</p>
     </div>
 
+    <!-- CARICA IL FILE SCRIPT.JS (Quello offuscato) -->
     <script src="script.js"></script>
 </body>
 </html>
