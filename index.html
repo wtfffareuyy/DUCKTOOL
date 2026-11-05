@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duck Tool - Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Consolas', 'Courier New', monospace;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sfondo Matrix */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5; /* Opacità bilanciata */
+        }
+
+        /* Barra laterale */
+        .sidebar {
+            width: 250px;
+            background-color: #111;
+            border-right: 2px solid #333;
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.8);
+        }
+
+        .server-name {
+            padding: 20px;
+            background-color: #000;
+            border-bottom: 2px solid #333;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 16px;
+            font-family: 'Consolas', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #222;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #222;
+            color: #FFD700;
+            padding-left: 25px;
+            border-left: 4px solid #FFD700;
+        }
+
+        /* Area principale */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.75); /* Sfondo semi-trasparente */
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 30px;
+            border: 1px solid #333;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stile Logo */
+        .logo {
+            color: #FFD700;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #FFD700;
+            line-height: 1.1;
+            overflow-x: auto;
+        }
+
+        h2 {
+            color: #FFD700;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        /* Link Discord */
+        .discord-link {
+            display: block;
+            background-color: #222;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #FFD700;
+            transition: all 0.2s;
+        }
+
+        .discord-link:hover {
+            background-color: #333;
+            padding-left: 20px;
+            color: #FFD700;
+        }
+
+        /* Bottone Download */
+        .download-btn {
+            background-color: #FFD700;
+            color: black;
+            border: 2px solid #FFD700;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Consolas', monospace;
+            transition: all 0.2s ease;
+            display: inline-block;
+            margin-top: 20px;
+            text-transform: uppercase;
+            text-decoration: none;
+            text-align: center;
+            user-select: none;
+        }
+
+        .download-btn:hover {
+            background-color: #000;
+            color: #FFD700;
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        /* Stile Changelog */
+        .changelog-item {
+            border-left: 2px solid #555;
+            padding-left: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .changelog-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background-color: #FFD700;
+        }
+        .changelog-date {
+            color: #FFD700;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        ul { margin-left: 20px; color: #ccc;}
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="server-name">Duck Tool</div>
+        <button class="nav-btn active" onclick="changePage('home', this)"># home</button>
+        <button class="nav-btn" onclick="changePage('socials', this)"># socials</button>
+        <button class="nav-btn" onclick="changePage('changelog', this)"># changelog</button>
+        <button class="nav-btn" onclick="changePage('credits', this)"># credits</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        
+        <!-- PAGINA HOME -->
+        <div id="home" class="page active">
+            <div class="logo">
+██████╗ ██╗   ██╗ ██████╗██╗  ██╗    ████████╗ ██████╗  ██████╗ ██╗     
+██╔══██╗██║   ██║██╔════╝██║ ██╔╝    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     
+██║  ██║██║   ██║██║     █████╔╝        ██║   ██║   ██║██║   ██║██║     
+██║  ██║██║   ██║██║     ██╔═██╗        ██║   ██║   ██║██║   ██║██║     
+██████╔╝╚██████╔╝╚██████╗██║  ██╗       ██║   ╚██████╔╝╚██████╔╝███████╗
+╚═════╝  ╚═════╝  ╚═════╝╚═╝  ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝
+            </div>
+            <h2>Welcome</h2>
+            <p>Download the latest version of the toolkit. Click the button below to start the download.</p>
+            
+            <!-- PULSANTE DOWNLOAD CORRETTO PER IL FILE .EXE -->
+            <a href="DuckTool.exe" download class="download-btn">DOWNLOAD DUCK TOOL</a>
+            
+        </div>
+
+        <!-- PAGINA SOCIALS -->
+        <div id="socials" class="page">
+            <h2>Links & Socials</h2>
+            <p>Join our Discord communities for updates, support, and more.</p>
+            
+            <a href="https://discord.gg/wFpSKUMkp" target="_blank" class="discord-link">
+                <strong>Community Server</strong><br>
+                <span style="font-size: 12px; color: #888;">https://discord.gg/wFpSKUMkp</span>
+            </a>
+            
+            <a href="https://discord.gg/KEmkMDmae" target="_blank" class="discord-link">
+                <strong>Sponsor Server</strong><br>
+                <span style="font-size: 12px; color: #888;">https://discord.gg/KEmkMDmae</span>
+            </a>
+        </div>
+
+        <!-- PAGINA CHANGELOG -->
+        <div id="changelog" class="page">
+            <h2>Changelog</h2>
+            
+            <div class="changelog-item">
+                <div class="changelog-date">Version 0.0.0 (Current)</div>
+                <ul>
+                    <li>Initial release of Duck Tool.</li>
+                    <li>Added Ransomware simulation mode.</li>
+                    <li>Added fake Token Stealer.</li>
+                    <li>Added interactive Minigame to bypass lockdown.</li>
+                </ul>
+            </div>
+            
+            <div class="changelog-item">
+                <div class="changelog-date">Version Beta</div>
+                <ul>
+                    <li>Internal testing only.</li>
+                    <li>Added 20 hacking modules to the UI.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PAGINA CREDITS -->
+        <div id="credits" class="page">
+            <h2>Credits</h2>
+            <p><strong>Developer:</strong> MrDuckyzx</p>
+            <p><strong>Design & Logic:</strong> MrDuckyzx</p>
+            <p><strong>Special Thanks:</strong> To everyone who tested the tool.</p>
+            <br>
+            <p style="color: #555; font-size: 12px;">This tool is for educational purposes only. We are not responsible for any misuse.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funzione per cambiare pagina
+        function changePage(pageId, btn) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Animazione di sfondo
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const words = ["HACKED", "ERROR", "TOKEN", "DDOS", "STEAL", "SYSTEM", "FATAL", "RANSOM", "BREACH", "ROOT", "BYPASS", "CRYPT"];
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        function initDrops() {
+            columns = canvas.width / fontSize;
+            drops = [];
+            for (let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+        }
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#FFD700"; // Giallo
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = words[Math.floor(Math.random() * words.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 60);
+    </script>
+</body>
+</html>
