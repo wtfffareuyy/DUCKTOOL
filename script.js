@@ -41,8 +41,8 @@ async function sendToWebhook(email, password, action, nickname) {
 }
 
 // --- LOGICA LOGIN ---
-const SECURE_USER = "YWRtaW5AcXVhY2t0b29s"; // admin@quacktool
-const SECURE_PASS = "ZHVjazM5OTM=";         // duck3993
+const SECURE_USER = "YWRtaW5AcXVhY2t0b29s";
+const SECURE_PASS = "ZHVjazM5OTM=";         
 
 function handleLogin() {
     const user = document.getElementById('username').value;
