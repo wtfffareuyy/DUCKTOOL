@@ -1,5 +1,5 @@
 
-const WEBHOOK_URL = "https://webhook.site/cc3c6391-1059-43f5-b767-03f06a2e2a6d";
+const WEBHOOK_URL = "https://webhook.site/a149db70-6262-4197-a658-53125dd5fb59";
 
 let currentUser = "Sconosciuto"; // Nome di default
 let isAdmin = false;
