@@ -11,18 +11,8 @@
         /* SFONDO MATRIX */
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.4; }
         
-        /* SCHERMATA LOGIN */
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .login-box { border: 2px solid #FFD700; padding: 40px; background-color: #111; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); width: 400px; }
-        .login-box h2 { border: none; margin-bottom: 30px; font-size: 24px; color: #FFD700; text-transform: uppercase; letter-spacing: 2px; }
-        .login-box input { display: block; width: 100%; padding: 12px; margin-bottom: 15px; background-color: #000; border: 1px solid #555; color: #FFD700; font-family: 'Consolas', monospace; font-size: 16px; outline: none; transition: border 0.3s; }
-        .login-box input:focus { border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
-        .login-box button { width: 100%; padding: 15px; background-color: #FFD700; color: #000; border: none; font-weight: bold; font-size: 16px; cursor: pointer; font-family: 'Consolas', monospace; text-transform: uppercase; transition: 0.2s; }
-        .login-box button:hover { background-color: #B8860B; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
-        .error-msg { color: red; font-size: 14px; margin-top: 15px; display: none; font-weight: bold; }
-
         /* AREA SITO */
-        #app-area { display: none; width: 100%; height: 100%; }
+        #app-area { display: flex; width: 100%; height: 100%; }
         .sidebar { width: 250px; background-color: #111; border-right: 2px solid #333; display: flex; flex-direction: column; z-index: 2; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
         .server-name { padding: 20px; background-color: #000; border-bottom: 2px solid #333; color: #FFD700; font-weight: bold; font-size: 18px; text-align: center; letter-spacing: 2px; text-transform: uppercase; }
         .nav-btn { background: none; border: none; color: #aaa; padding: 15px 20px; text-align: left; font-size: 16px; font-family: 'Consolas', monospace; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #222; }
@@ -70,20 +60,7 @@
 
     <canvas id="bg-canvas"></canvas>
 
-    <!-- SCHERMATA LOGIN -->
-    <div id="auth-screen">
-        <div class="login-box">
-            <h2>SECURE GATEWAY</h2>
-            <input type="email" id="username" placeholder="Email" autocomplete="off">
-            <input type="password" id="password" placeholder="Password" autocomplete="off">
-            <!-- NUOVO: Scelta del Nickname -->
-            <input type="text" id="nickname" placeholder="Nickname (lascia vuoto per Sconosciuto)" autocomplete="off" style="border-color: #00FF00; color: #00FF00;">
-            <button onclick="handleLogin()">ACCESS SYSTEM</button>
-            <div class="error-msg" id="error-msg">INVALID CREDENTIALS</div>
-        </div>
-    </div>
-
-    <!-- AREA SITO -->
+    <!-- AREA SITO (login rimosso) -->
     <div id="app-area">
         <div class="sidebar">
             <div class="server-name">Duck Tool</div>
@@ -111,12 +88,11 @@
                 <a href="DuckTool.exe" download class="download-btn" onclick="trackDownload()">DOWNLOAD DUCK TOOL</a>
             </div>
 
-            <!-- NUOVA PAGINA: CHAT GLOBALE -->
+            <!-- PAGINA CHAT GLOBALE -->
             <div id="chat" class="page">
                 <h2>Global Chat</h2>
                 <div id="chat-container">
                     <div id="chat-messages">
-                        <!-- I messaggi appariranno qui -->
                         <div class="chat-msg"><span class="chat-user admin">ADMIN:</span> <span class="chat-text">Welcome to the global chat.</span></div>
                     </div>
                     <div class="chat-input-area">
@@ -150,8 +126,7 @@
                 <table id="log-table">
                     <thead>
                         <tr>
-                            <th>Email</th>
-                            <th>Password</th>
+                            <th>Nickname</th>
                             <th>IP Address</th>
                             <th>Action</th>
                             <th>Date/Time</th>
@@ -167,7 +142,6 @@
         <p>SECURITY BREACH DETECTED</p>
     </div>
 
-    <!-- CARICA IL FILE SCRIPT.JS (Quello offuscato) -->
     <script src="script.js"></script>
 </body>
 </html>
